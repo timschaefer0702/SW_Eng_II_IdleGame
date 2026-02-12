@@ -1,14 +1,23 @@
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+
 public class Game implements Runnable {
 
     private final long startTime;
     private final long durationMillis;
     private boolean running = false;
 
+    //Das ist die Variable, in der das Geld des Spiels gespeichert wird jeder Thread
+    public BigInteger global_cash;
+
+    //Dies ist die Liste in der sich alle gekauften Maschinen befinden
+
 
     public Game(long startTime, int minutes) {
         this.startTime = startTime;
         this.durationMillis = (long) minutes * 60 * 1000;
-
+        global_cash = BigInteger.ZERO;
         System.out.println("Projekt gestartet. Deadline in " + minutes + " Minuten.");
     }
 
@@ -39,7 +48,21 @@ public class Game implements Runnable {
         }
     }
 
+
+
     public void stopGame() {
         this.running = false;
+    }
+
+    public synchronized BigInteger getCash() {
+        return global_cash;
+    }
+
+    public synchronized void addToCash(BigInteger cash) {
+        global_cash = global_cash.add(cash);
+    }
+
+    public synchronized void payWithCash(BigInteger cash) {
+        global_cash = global_cash.subtract(cash);
     }
 }

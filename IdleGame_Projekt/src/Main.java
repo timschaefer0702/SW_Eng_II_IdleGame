@@ -7,7 +7,7 @@ public class Main {
         long currentTime = Instant.now().toEpochMilli();
 
         //TODO User eingabe wie lang gespielt werden will bevor das Spiel startet
-        Game game = new Game(currentTime ,2);
+        Game game = new Game(currentTime ,1);
 
         Thread gameThread = new Thread(game);
         gameThread.start();

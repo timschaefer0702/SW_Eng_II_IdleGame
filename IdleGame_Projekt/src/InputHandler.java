@@ -1,3 +1,4 @@
+import java.math.BigInteger;
 import java.util.Scanner;
 
 public class InputHandler implements Runnable {
@@ -12,7 +13,7 @@ public class InputHandler implements Runnable {
     public void run() {
         running = true;
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Konsole bereit. Befehle: 'status', 'stop', 'help'");
+        System.out.println("Konsole bereit.Spiel Startet!");
 
         while (running) {
             String input = scanner.nextLine().toLowerCase();
@@ -34,10 +35,18 @@ public class InputHandler implements Runnable {
                     System.out.println("Verfügbare Befehle: status, stop");
                     break;
 
+                case "cash":
+                    printGameCash();
+                    break;
+
                 default:
                     System.out.println("Unbekannter Befehl. Der Ingenieur schüttelt den Kopf.");
             }
         }
         scanner.close();
+    }
+
+    public void printGameCash(){
+        System.out.println(this.game.getCash());
     }
 }
