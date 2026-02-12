@@ -15,6 +15,10 @@ public class Game implements Runnable {
     @Override
     public void run() {
         this.running = true;
+        InputHandler konsole = new InputHandler(this);
+        Thread konsolenThread = new Thread(konsole);
+        konsolenThread.start();
+
         long endTime = startTime + durationMillis;
 
         while (running) {
