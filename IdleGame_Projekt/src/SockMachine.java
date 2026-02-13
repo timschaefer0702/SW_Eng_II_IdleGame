@@ -5,7 +5,7 @@ public class SockMachine implements Machine {
     private String name;
     private volatile int production_interval;
     private int level;
-    private String type = "Sockenmachine";
+    private String type = "sockmachine";
 
     private Game game;
 
@@ -14,6 +14,9 @@ public class SockMachine implements Machine {
         this.level = 0;
         this.production_interval = Definitions.getSockMachineProductionSpeed(this.level);
         this.game = game;
+    }
+
+    public SockMachine() {
     }
 
     @Override
@@ -52,8 +55,17 @@ public class SockMachine implements Machine {
         return this.type;
     }
 
+
     @Override
     public int getLevel() {
         return this.level;
+    }
+
+    @Override
+    public synchronized void sell() {
+        //TODO Verkaufswert an Level anpassen
+        this.game.sockMachineFactory.removeFromMachines(this);
+        this.game.global_machines.remove(this);
+        this.game.addToCash(BigInteger.valueOf(100));
     }
 }

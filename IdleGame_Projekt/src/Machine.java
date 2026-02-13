@@ -5,6 +5,7 @@ public interface Machine extends Runnable{
      String getName();
      String getType();
      int getLevel();
+     void sell();
 
 
 }

@@ -16,6 +16,7 @@ public class Game implements Runnable {
 
     public SockMachineFactory sockMachineFactory = new SockMachineFactory(this);
 
+    public List<String> typeList = List.of(new SockMachine().getType());
 
     public Game(long startTime, int minutes) {
         this.startTime = startTime;
