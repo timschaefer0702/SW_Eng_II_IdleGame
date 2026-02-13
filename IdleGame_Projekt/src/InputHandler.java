@@ -97,11 +97,8 @@ public class InputHandler implements Runnable {
             System.out.println("Bitte Art und Name der Maschine eingeben!");
         }else if (!args[1].isEmpty() && this.game.typeList.contains(args[1])) {
             Machine target = this.findMachineWithName(args[2]);
-            if (target != null) {
-                target.upgrade();
+            if (target != null && target.upgrade()) {
                 System.out.println(target.getType() + " "+ target.getName() + " upgraded!");
-            }else {
-                System.out.println("Fehler!");
             }
         }
             else{
@@ -124,9 +121,14 @@ public class InputHandler implements Runnable {
 
     public void buySockmachine (String name)
     {
-       Machine machine = this.game.sockMachineFactory.createMachine(name);
-       game.global_machines.add(machine);
-        System.out.println("Sockmachine " + machine.getName() + " bought!");
+        if(this.game.getCash().compareTo(Definitions.getSockMachinePrice()) > 0)
+        {
+            this.game.payWithCash(Definitions.getSockMachinePrice());
+            Machine machine = this.game.sockMachineFactory.createMachine(name);
+            game.global_machines.add(machine);
+            System.out.println(machine.getType() + " " + machine.getName() + " bought!");
+        }
+
     }
 
     public boolean anfragen ()
@@ -153,7 +155,7 @@ public class InputHandler implements Runnable {
             }
         }
         else{
-            Machine target = this.findMachineWithName(args[2]);
+            Machine target = this.findMachineWithName(args[1]);
             if (target != null) {
                 target.sell();
             }

@@ -20,6 +20,7 @@ public class Game implements Runnable {
 
     public Game(long startTime, int minutes) {
         this.startTime = startTime;
+        if (minutes <= 0) { minutes = Integer.MAX_VALUE; }
         this.durationMillis = (long) minutes * 60 * 1000;
         global_cash = BigInteger.ZERO;
 

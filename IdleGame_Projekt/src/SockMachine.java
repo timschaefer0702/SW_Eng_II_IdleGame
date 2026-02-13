@@ -7,6 +7,7 @@ public class SockMachine implements Machine {
     private int level;
     private String type = "sockmachine";
 
+
     private Game game;
 
     public SockMachine(String name, Game game) {
@@ -39,10 +40,18 @@ public class SockMachine implements Machine {
     }
 
     @Override
-    public void upgrade() {
-        //TODO check if upgradable and subtract money
-        this.level++;
-        this.production_interval = Definitions.getSockMachineProductionSpeed(this.level);
+    public boolean upgrade() {
+        if(this.isUpgradable(this.level))
+        {
+            game.payWithCash(BigInteger.valueOf(Definitions.getSockMachineUpgradeCost(this.level)));
+            this.level++;
+            this.production_interval = Definitions.getSockMachineProductionSpeed(this.level);
+        }
+        else {
+            System.out.println("Zu wenig Cash! Du benötoigst " + Definitions.getSockMachineUpgradeCost(this.level) + " Du hast " + this.game.getCash() + " Cash");
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -61,6 +70,7 @@ public class SockMachine implements Machine {
         return this.level;
     }
 
+
     @Override
     public synchronized void sell() {
         //TODO Verkaufswert an Level anpassen
@@ -68,4 +78,12 @@ public class SockMachine implements Machine {
         this.game.global_machines.remove(this);
         this.game.addToCash(BigInteger.valueOf(100));
     }
+
+    @Override
+    public boolean isUpgradable(int currLevel) {
+        BigInteger upgradecosts = (BigInteger.valueOf(Definitions.getSockMachineUpgradeCost(currLevel)));
+        return (this.level < Definitions.getSockMachineProductionFinalIndex()) && (this.game.getCash().compareTo(upgradecosts) > 0);
+    }
+
+
 }

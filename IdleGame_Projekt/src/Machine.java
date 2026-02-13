@@ -1,11 +1,12 @@
 public interface Machine extends Runnable{
      void run();
      void stop();
-     void upgrade();
+     boolean upgrade();
      String getName();
      String getType();
      int getLevel();
      void sell();
+     boolean isUpgradable (int currLevel);
 
 
 }
