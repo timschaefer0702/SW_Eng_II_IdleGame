@@ -39,6 +39,9 @@ public class InputHandler implements Runnable {
                     printGameCash();
                     break;
 
+                case "upgrade":
+
+                    break;
                 default:
                     System.out.println("Unbekannter Befehl. Der Ingenieur schüttelt den Kopf.");
             }

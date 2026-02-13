@@ -12,24 +12,28 @@ public class Game implements Runnable {
     public BigInteger global_cash;
 
     //Dies ist die Liste in der sich alle gekauften Maschinen befinden
+    public List<Machine> global_machines = new ArrayList<>();
+
+    public SockMachineFactory sockMachineFactory = new SockMachineFactory(this);
 
 
     public Game(long startTime, int minutes) {
         this.startTime = startTime;
         this.durationMillis = (long) minutes * 60 * 1000;
         global_cash = BigInteger.ZERO;
+
         System.out.println("Projekt gestartet. Deadline in " + minutes + " Minuten.");
     }
 
     @Override
     public void run() {
         this.running = true;
-        InputHandler konsole = new InputHandler(this);
-        Thread konsolenThread = new Thread(konsole);
-        konsolenThread.start();
-
         long endTime = startTime + durationMillis;
+        if(init()!=null)
+        {
+            System.out.println("Error occured while initializing game.");
 
+        }
         while (running) {
             long currentTime = System.currentTimeMillis();
             if (currentTime >= endTime) {
@@ -46,6 +50,21 @@ public class Game implements Runnable {
                 Thread.currentThread().interrupt();
             }
         }
+    }
+
+    public Exception init()
+    {
+        //Konsole wird gestartet und Startobjekte initialisiert
+        try {
+            SockMachine startMachine = (SockMachine) sockMachineFactory.createMachine("startMachine");
+            global_machines.add(startMachine);
+            InputHandler konsole = new InputHandler(this);
+            Thread konsolenThread = new Thread(konsole);
+            konsolenThread.start();
+        } catch (Exception e) {
+            return e;
+        }
+        return null;
     }
 
 
