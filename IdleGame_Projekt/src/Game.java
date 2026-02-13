@@ -60,6 +60,7 @@ public class Game implements Runnable {
             global_machines.add(startMachine);
             InputHandler konsole = new InputHandler(this);
             Thread konsolenThread = new Thread(konsole);
+            konsolenThread.setDaemon(true);
             konsolenThread.start();
         } catch (Exception e) {
             return e;

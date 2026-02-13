@@ -40,6 +40,9 @@ public class InputHandler implements Runnable {
                     break;
 
                 case "upgrade":
+                    if(!game.global_machines.isEmpty()) {
+                        break;
+                    }
 
                     break;
                 default:
@@ -52,4 +55,6 @@ public class InputHandler implements Runnable {
     public void printGameCash(){
         System.out.println(this.game.getCash());
     }
+
+
 }
