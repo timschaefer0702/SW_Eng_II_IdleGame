@@ -1,4 +1,5 @@
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Scanner;
 
 public class InputHandler implements Runnable {
@@ -18,21 +19,17 @@ public class InputHandler implements Runnable {
         while (running) {
             String input = scanner.nextLine().toLowerCase();
 
-            switch (input) {
+            String[] args = input.split("\\s+");
+            String command = args[0];
+            switch (command) {
                 //TODO Hier Game und System controls einfügen
-                case "status":
-                    // Hier rufen wir eine Methode im Game-Thread auf
-                    System.out.println("Ingenieur-Bericht: Alles im grünen Bereich (vielleicht).");
-                    break;
 
                 case "stop":
-                    System.out.println("Herunterfahren wird eingeleitet...");
-                    game.stopGame(); // Wir steuern den anderen Thread
-                    this.running = false;
+                    exitGame();
                     break;
 
                 case "help":
-                    System.out.println("Verfügbare Befehle: status, stop");
+                    help();
                     break;
 
                 case "cash":
@@ -40,9 +37,10 @@ public class InputHandler implements Runnable {
                     break;
 
                 case "upgrade":
-                    if(!game.global_machines.isEmpty()) {
+                    if(game.global_machines.isEmpty()) {
                         break;
                     }
+                    this.upgrade(args);
 
                     break;
                 default:
@@ -54,6 +52,44 @@ public class InputHandler implements Runnable {
 
     public void printGameCash(){
         System.out.println(this.game.getCash());
+    }
+
+    public void exitGame()
+    {
+        System.out.println("Herunterfahren wird eingeleitet...");
+        this.running = false;
+        game.stopGame();
+
+    }
+
+    public void help()
+    {
+        System.out.println("Verfügbare Befehle: status, stop");
+    }
+
+    public synchronized void upgrade(String[] args)
+    {
+
+        if (args.length<3) {
+            System.out.println("Bitte Art und Name der Maschine eingeben!");
+
+        }else if (args[1].contentEquals("sockmachine")) {
+            List<Machine> sockmachines = this.game.sockMachineFactory.getMachines();
+            SockMachine target = (SockMachine) sockmachines.stream()
+                    .filter(m -> m.getName().equalsIgnoreCase(args[2]))
+                    .findFirst()
+                    .orElse(null);
+            if (target != null) {
+                target.upgrade();
+                System.out.println("Machine " + target.getName() + " upgraded!");
+            }else {
+                System.out.println("Fehler!");
+            }
+        } else if (args[1].contentEquals("schmarnmachine")) {
+            
+        } else{
+            System.out.println("Schreibfehler!");
+        }
     }
 
 

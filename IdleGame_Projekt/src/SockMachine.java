@@ -36,7 +36,13 @@ public class SockMachine implements Machine {
 
     @Override
     public void upgrade() {
+        //TODO check if upgradable and subtract money
         this.level++;
         this.production_interval = Definitions.getSockMachineProductionSpeed(this.level);
+    }
+
+    @Override
+    public String getName() {
+        return this.name;
     }
 }
