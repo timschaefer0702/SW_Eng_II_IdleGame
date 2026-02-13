@@ -36,13 +36,21 @@ public class InputHandler implements Runnable {
                     printGameCash();
                     break;
 
+                case "machines":
+                    printMachines();
+                    break;
+
                 case "upgrade":
                     if(game.global_machines.isEmpty()) {
                         break;
                     }
                     this.upgrade(args);
-
                     break;
+
+                case "buy":
+                    this.buy(args);
+                    break;
+
                 default:
                     System.out.println("Unbekannter Befehl. Der Ingenieur schüttelt den Kopf.");
             }
@@ -52,6 +60,13 @@ public class InputHandler implements Runnable {
 
     public void printGameCash(){
         System.out.println(this.game.getCash());
+    }
+
+    public void printMachines(){
+        List<Machine> list = this.game.global_machines;
+        for (Machine machine : list) {
+            System.out.println("Maschine vom Typ: "+ machine.getType() + " mit Namen " + machine.getName() + " hat Level: " + machine.getLevel());
+        }
     }
 
     public void exitGame()
@@ -69,28 +84,53 @@ public class InputHandler implements Runnable {
 
     public synchronized void upgrade(String[] args)
     {
-
         if (args.length<3) {
             System.out.println("Bitte Art und Name der Maschine eingeben!");
-
         }else if (args[1].contentEquals("sockmachine")) {
-            List<Machine> sockmachines = this.game.sockMachineFactory.getMachines();
-            SockMachine target = (SockMachine) sockmachines.stream()
-                    .filter(m -> m.getName().equalsIgnoreCase(args[2]))
-                    .findFirst()
-                    .orElse(null);
-            if (target != null) {
-                target.upgrade();
-                System.out.println("Machine " + target.getName() + " upgraded!");
-            }else {
-                System.out.println("Fehler!");
-            }
+            this.upgradeSockmachine(args[2]);
+
         } else if (args[1].contentEquals("schmarnmachine")) {
-            
+
         } else{
             System.out.println("Schreibfehler!");
         }
     }
+
+    public synchronized void buy(String[] args)
+    {
+        //TODO geldwert einbauen
+        if (args.length<3) {
+            System.out.println("Bitte Art und Name der Maschine eingeben!");
+        }else if (args[1].contentEquals("sockmachine")) {
+            this.buySockmachine(args[2]);
+        }else{
+            System.out.println("Schreibfehler!");
+        }
+    }
+
+    public void upgradeSockmachine (String name)
+    {
+        List<Machine> sockmachines = this.game.sockMachineFactory.getMachines();
+        SockMachine target = (SockMachine) sockmachines.stream()
+                .filter(m -> m.getName().equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
+
+        if (target != null) {
+            target.upgrade();
+            System.out.println("Sockmachine " + target.getName() + " upgraded!");
+        }else {
+            System.out.println("Fehler!");
+        }
+    }
+
+    public void buySockmachine (String name)
+    {
+       Machine machine = this.game.sockMachineFactory.createMachine(name);
+       game.global_machines.add(machine);
+        System.out.println("Sockmachine " + machine.getName() + " bought!");
+    }
+
 
 
 }

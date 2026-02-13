@@ -3,5 +3,8 @@ public interface Machine extends Runnable{
      void stop();
      void upgrade();
      String getName();
+     String getType();
+     int getLevel();
+
 
 }

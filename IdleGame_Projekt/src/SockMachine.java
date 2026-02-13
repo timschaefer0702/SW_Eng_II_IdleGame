@@ -5,6 +5,7 @@ public class SockMachine implements Machine {
     private String name;
     private volatile int production_interval;
     private int level;
+    private String type = "Sockenmachine";
 
     private Game game;
 
@@ -44,5 +45,15 @@ public class SockMachine implements Machine {
     @Override
     public String getName() {
         return this.name;
+    }
+
+    @Override
+    public String getType() {
+        return this.type;
+    }
+
+    @Override
+    public int getLevel() {
+        return this.level;
     }
 }
