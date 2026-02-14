@@ -1,6 +1,8 @@
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class Game implements Runnable {
 
@@ -13,10 +15,19 @@ public class Game implements Runnable {
 
     //Dies ist die Liste in der sich alle gekauften Maschinen befinden
     public List<Machine> global_machines = new ArrayList<>();
+    public List<String> typeList = List.of(SockMachine.type);
+    public List<String> productList = List.of(Sock.type);
 
     public SockMachineFactory sockMachineFactory = new SockMachineFactory(this);
+    private static final AtomicLong sockCounter = new AtomicLong(0);
+    public static long getSockID () { return sockCounter.incrementAndGet();}
+    public long seeSockID() { return sockCounter.get();}
 
-    public List<String> typeList = List.of(new SockMachine().getType());
+    private final Warehouse warehouse = new Warehouse(this);
+
+
+
+
 
     public Game(long startTime, int minutes) {
         this.startTime = startTime;
@@ -29,13 +40,14 @@ public class Game implements Runnable {
 
     @Override
     public void run() {
+
         this.running = true;
         long endTime = startTime + durationMillis;
         if(init()!=null)
         {
             System.out.println("Error occured while initializing game.");
-
         }
+
         while (running) {
             long currentTime = System.currentTimeMillis();
             if (currentTime >= endTime) {
@@ -45,6 +57,7 @@ public class Game implements Runnable {
             }
 
             try {
+                // 24 ticks / s
                 Thread.sleep(42);
             } catch (InterruptedException e) {
                 System.err.println("Thread wurde unerwartet unterbrochen!");
@@ -70,6 +83,9 @@ public class Game implements Runnable {
         return null;
     }
 
+    public Warehouse getWarehouse() {
+        return warehouse;
+    }
 
 
     public void stopGame() {

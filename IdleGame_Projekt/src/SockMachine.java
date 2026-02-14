@@ -5,7 +5,7 @@ public class SockMachine implements Machine {
     private String name;
     private volatile int production_interval;
     private int level;
-    private String type = "sockmachine";
+    public static String type = "sockmachine";
 
 
     private Game game;
@@ -17,8 +17,7 @@ public class SockMachine implements Machine {
         this.game = game;
     }
 
-    public SockMachine() {
-    }
+
 
     @Override
     public void run() {
@@ -26,7 +25,8 @@ public class SockMachine implements Machine {
         while (running) {
             try{
                 Thread.sleep(production_interval);
-                this.game.addToCash(BigInteger.valueOf(1));//ersetzen durch objekte die erzeugt werden
+                Sock sock = new Sock(this.name);
+                this.game.getWarehouse().pushSock(sock);
             } catch (Exception e) {
                 running = false;
                 System.out.println(e.getMessage());
@@ -61,7 +61,7 @@ public class SockMachine implements Machine {
 
     @Override
     public String getType() {
-        return this.type;
+        return type;
     }
 
 
@@ -73,10 +73,9 @@ public class SockMachine implements Machine {
 
     @Override
     public synchronized void sell() {
-        //TODO Verkaufswert an Level anpassen
         this.game.sockMachineFactory.removeFromMachines(this);
         this.game.global_machines.remove(this);
-        this.game.addToCash(BigInteger.valueOf(100));
+        this.game.addToCash(BigInteger.valueOf(Definitions.getSockMachineSellingPrice(this.level)));
     }
 
     @Override

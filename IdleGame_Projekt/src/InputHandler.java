@@ -22,13 +22,13 @@ public class InputHandler implements Runnable {
             String[] args = input.split("\\s+");
             String command = args[0];
             switch (command) {
-                //TODO Hier Game und System controls einfügen
 
                 case "stop":
                     exitGame();
                     break;
 
                 case "help":
+                    //TODO richtige erklärung für Befehle
                     help();
                     break;
 
@@ -40,16 +40,20 @@ public class InputHandler implements Runnable {
                     printMachines();
                     break;
 
+                case "count":
+                    countProducts(args);
+                    break;
+
                 case "upgrade":
                     if(game.global_machines.isEmpty()) {
                         System.out.println("Keine Maschinen zum Upgraden verfügbar!");
                         break;
                     }
-                    if(this.anfragen()){this.upgrade(args);};
+                    if(this.anfragen("Willst du wirklich diese Maschine upgraden")){this.upgrade(args);};
                     break;
 
                 case "buy":
-                    if(this.anfragen()){this.buy(args);};
+                    if(this.anfragen("Willst du wirklich diese Maschine kaufen")){this.buy(args);};
                     break;
 
                 case "sell":
@@ -57,11 +61,13 @@ public class InputHandler implements Runnable {
                         System.out.println("Keine Maschinen zum Verkaufen verfügbar!");
                         break;
                     }
-                    if(this.anfragen()){this.sell(args);};
+                    if(this.anfragen("Willst du wirklich diese Maschine verkaufen")){this.sell(args);};
                     break;
 
                 default:
-                    System.out.println("Unbekannter Befehl. Der Ingenieur schüttelt den Kopf.");
+                    System.out.println("Unbekannter Befehl. Brauchst du hilfe?");
+                    if(this.anfragen("")){this.help();};
+                    break;
             }
         }
         scanner.close();
@@ -91,6 +97,17 @@ public class InputHandler implements Runnable {
         System.out.println("Verfügbare Befehle: status, stop");
     }
 
+    public void countProducts(String[] args)
+    {
+        if(this.game.productList.contains(args[1]))
+        {
+            if(Sock.type.equals(args[1])){System.out.println(this.game.seeSockID());}
+        } else {
+            System.out.println("Produkt nicht gefunden 😢");
+
+            }
+    }
+
     public synchronized void upgrade(String[] args)
     {
         if (args.length<3) {
@@ -108,7 +125,6 @@ public class InputHandler implements Runnable {
 
     public synchronized void buy(String[] args)
     {
-        //TODO geldwert einbauen
         if (args.length<3) {
             System.out.println("Bitte Art und Name der Maschine eingeben!");
         }else if (args[1].contentEquals("sockmachine")) {
@@ -127,13 +143,15 @@ public class InputHandler implements Runnable {
             Machine machine = this.game.sockMachineFactory.createMachine(name);
             game.global_machines.add(machine);
             System.out.println(machine.getType() + " " + machine.getName() + " bought!");
+        }else {
+            System.out.println("Zu wenig Cash! Du benötoigst " + Definitions.getSockMachinePrice() + " Du hast " + this.game.getCash() + " Cash");
         }
 
     }
 
-    public boolean anfragen ()
+    public boolean anfragen (String botschaft)
     {
-        System.out.println("Willst du das wirklich machen? ([y]/[n])");
+        System.out.println(botschaft + "([y]/[n])");
         Scanner scanner = new Scanner(System.in);
         String input = scanner.nextLine().toLowerCase();
         return input.equalsIgnoreCase("y")||input.equalsIgnoreCase("yes")||input.equalsIgnoreCase("ja");
