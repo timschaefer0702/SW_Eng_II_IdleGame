@@ -46,12 +46,13 @@ public class SockMachine implements Machine {
             game.payWithCash(BigInteger.valueOf(Definitions.getSockMachineUpgradeCost(this.level)));
             this.level++;
             this.production_interval = Definitions.getSockMachineProductionSpeed(this.level);
+            return true;
         }
         else {
             System.out.println("Zu wenig Cash! Du benötoigst " + Definitions.getSockMachineUpgradeCost(this.level) + " Du hast " + this.game.getCash() + " Cash");
             return false;
         }
-        return true;
+
     }
 
     @Override

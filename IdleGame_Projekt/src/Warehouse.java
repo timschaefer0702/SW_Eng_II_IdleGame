@@ -7,6 +7,7 @@ public class Warehouse {
         this.game = game;
     }
     private final ConcurrentLinkedDeque<Sock> sockWarehouse = new ConcurrentLinkedDeque<>();
+    private final ConcurrentLinkedDeque<Lobe> lobeWarehouse = new ConcurrentLinkedDeque<>();
 
 
 
@@ -23,12 +24,9 @@ public class Warehouse {
         return stack.pop();
     }
 
-    public synchronized void pushSock(Sock sock)
-    {
-        this.push(sockWarehouse, sock);
-    }
-    public synchronized Sock popSock()
-    {
-        return this.pop(sockWarehouse);
-    }
+    public synchronized void pushSock(Sock sock) {this.push(sockWarehouse, sock);}
+    public synchronized Sock popSock() {return this.pop(sockWarehouse);}
+
+    public synchronized void pushLobe(Lobe lobe) {this.push(lobeWarehouse, lobe);}
+    public synchronized Lobe popLobe() {return this.pop(lobeWarehouse);}
 }

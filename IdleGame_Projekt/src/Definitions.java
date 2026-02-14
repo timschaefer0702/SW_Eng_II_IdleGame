@@ -27,4 +27,16 @@ public class Definitions {
     public static int getSockMachineSellingPrice(int index){
         return sockMachineSellingPrices.get(index);
     }
+
+    public static final BigInteger lobeMachinePrice = BigInteger.valueOf(5);
+    public static int getLobeMachineMaxLevel() {return 30;}
+
+    public static BigInteger getLobeMachineUpgradeCost(int currLevel)
+    {
+        return BigInteger.valueOf((long) currLevel * currLevel + 2);
+    }
+    public static BigInteger getLobeMachinePrice()
+    {
+        return lobeMachinePrice;
+    }
 }

@@ -15,13 +15,17 @@ public class Game implements Runnable {
 
     //Dies ist die Liste in der sich alle gekauften Maschinen befinden
     public List<Machine> global_machines = new ArrayList<>();
-    public List<String> typeList = List.of(SockMachine.type);
-    public List<String> productList = List.of(Sock.type);
+    public List<String> typeList = List.of(SockMachine.type,LobeMachine.type);
+    public List<String> productList = List.of(Sock.type,Lobe.type);
 
     public SockMachineFactory sockMachineFactory = new SockMachineFactory(this);
+    public LobeMachineFactory lobeMachineFactory = new LobeMachineFactory(this);
     private static final AtomicLong sockCounter = new AtomicLong(0);
+    private static final AtomicLong lobeCounter = new AtomicLong(0);
     public static long getSockID () { return sockCounter.incrementAndGet();}
+    public static long getLobeID () { return lobeCounter.incrementAndGet();}
     public long seeSockID() { return sockCounter.get();}
+    public long seeLobeID() { return lobeCounter.get();}
 
     private final Warehouse warehouse = new Warehouse(this);
 
@@ -102,5 +106,14 @@ public class Game implements Runnable {
 
     public synchronized void payWithCash(BigInteger cash) {
         global_cash = global_cash.subtract(cash);
+    }
+
+    public boolean isNameUnique (String name)
+    {
+        if (name == null) return false;
+        for (Machine machine : global_machines) {
+            if(name.equalsIgnoreCase(machine.getName())){return false;}
+        }
+        return true;
     }
 }

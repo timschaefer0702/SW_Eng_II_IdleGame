@@ -17,12 +17,12 @@ public class SockMachineFactory implements MachineFactory{
 
     @Override
     public synchronized void addToMachines(Machine machine) {
-        sockMachines.add(machine);
+        this.sockMachines.add(machine);
     }
 
     @Override
     public synchronized void removeFromMachines(Machine machine) {
-        sockMachines.remove(machine);
+        this.sockMachines.remove(machine);
     }
 
     @Override
@@ -31,7 +31,7 @@ public class SockMachineFactory implements MachineFactory{
         Thread thread = new Thread(machine);
         thread.setDaemon(true);
         thread.start();
-        sockMachines.add(machine);
+        this.addToMachines(machine);
         return machine;
     }
 

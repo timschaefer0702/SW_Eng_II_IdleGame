@@ -1,3 +1,4 @@
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -22,6 +23,10 @@ public class InputHandler implements Runnable {
             String[] args = input.split("\\s+");
             String command = args[0];
             switch (command) {
+                //for test
+                case "cheat":
+                    this.game.addToCash(BigInteger.valueOf(1000));
+                    break;
 
                 case "stop":
                     exitGame();
@@ -102,6 +107,7 @@ public class InputHandler implements Runnable {
         if(this.game.productList.contains(args[1]))
         {
             if(Sock.type.equals(args[1])){System.out.println(this.game.seeSockID());}
+            else if (Lobe.type.equals(args[1])){System.out.println(this.game.seeLobeID());}
         } else {
             System.out.println("Produkt nicht gefunden 😢");
 
@@ -127,9 +133,13 @@ public class InputHandler implements Runnable {
     {
         if (args.length<3) {
             System.out.println("Bitte Art und Name der Maschine eingeben!");
-        }else if (args[1].contentEquals("sockmachine")) {
+        }else if(!this.game.isNameUnique(args[2])){
+            System.out.println("Es gibt schon eine Maschine mit dem Namen " + args[2] + " !");
+        } else if (args[1].equalsIgnoreCase("sockmachine")) {
             this.buySockmachine(args[2]);
-        }else{
+        } else if (args[1].equalsIgnoreCase("lobemachine")) {
+            this.buyLobemachine(args[2]);
+        } else{
             System.out.println("Schreibfehler!");
         }
     }
@@ -146,7 +156,19 @@ public class InputHandler implements Runnable {
         }else {
             System.out.println("Zu wenig Cash! Du benötoigst " + Definitions.getSockMachinePrice() + " Du hast " + this.game.getCash() + " Cash");
         }
+    }
 
+    public void buyLobemachine (String name)
+    {
+        if(this.game.getCash().compareTo(Definitions.getLobeMachinePrice()) > 0)
+        {
+            this.game.payWithCash(Definitions.getLobeMachinePrice());
+            Machine machine = this.game.lobeMachineFactory.createMachine(name);
+            game.global_machines.add(machine);
+            System.out.println(machine.getType() + " " + machine.getName() + " bought!");
+        }else{
+            System.out.println("Zu wenig Cash! Du benötoigst " + Definitions.getLobeMachinePrice() + " Du hast " + this.game.getCash() + " Cash");
+        }
     }
 
     public boolean anfragen (String botschaft)
