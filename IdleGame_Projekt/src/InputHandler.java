@@ -25,11 +25,16 @@ public class InputHandler implements Runnable {
             switch (command) {
                 //for test
                 case "cheat":
+                    System.out.println("Okay du Frechdachs 🦡 dann Schummel mal los");
                     this.game.addToCash(BigInteger.valueOf(1000));
                     break;
 
                 case "stop":
                     exitGame();
+                    break;
+
+                case "time":
+                    System.out.println(game.getRemainingTime());
                     break;
 
                 case "help":
@@ -211,6 +216,8 @@ public class InputHandler implements Runnable {
         }
         return null;
     }
+
+
 
 
 

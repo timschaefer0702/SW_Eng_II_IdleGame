@@ -1,7 +1,6 @@
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class Game implements Runnable {
@@ -31,6 +30,12 @@ public class Game implements Runnable {
 
 
 
+    private long endTime;
+    private InputHandler inputHandler;
+    private GUIManager guiManager;
+
+
+
 
 
     public Game(long startTime, int minutes) {
@@ -46,7 +51,7 @@ public class Game implements Runnable {
     public void run() {
 
         this.running = true;
-        long endTime = startTime + durationMillis;
+        endTime = startTime + durationMillis;
         if(init()!=null)
         {
             System.out.println("Error occured while initializing game.");
@@ -62,7 +67,8 @@ public class Game implements Runnable {
 
             try {
                 // 24 ticks / s
-                Thread.sleep(42);
+                Thread.sleep(100);
+                this.guiManager.renderUI();
             } catch (InterruptedException e) {
                 System.err.println("Thread wurde unerwartet unterbrochen!");
                 running = false;
@@ -73,12 +79,12 @@ public class Game implements Runnable {
 
     public Exception init()
     {
-        //Konsole wird gestartet und Startobjekte initialisiert
         try {
             SockMachine startMachine = (SockMachine) sockMachineFactory.createMachine("startMachine");
             global_machines.add(startMachine);
-            InputHandler konsole = new InputHandler(this);
-            Thread konsolenThread = new Thread(konsole);
+            inputHandler = new InputHandler(this);
+            guiManager = new GUIManager(this);
+            Thread konsolenThread = new Thread(inputHandler);
             konsolenThread.setDaemon(true);
             konsolenThread.start();
         } catch (Exception e) {
@@ -93,6 +99,7 @@ public class Game implements Runnable {
 
 
     public void stopGame() {
+        guiManager.closeUI();
         this.running = false;
     }
 
@@ -116,4 +123,20 @@ public class Game implements Runnable {
         }
         return true;
     }
+
+    public String getRemainingTime()
+    {
+        long currentTime = System.currentTimeMillis();
+        long diff = endTime - currentTime;
+        long totalSeconds = diff / 1000;
+        return String.format("%02d:%02d", totalSeconds / 60, totalSeconds % 60);
+    }
+
+    public long getEndTime() {
+        return endTime;
+    }
+
+
+
+
 }

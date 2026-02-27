@@ -69,7 +69,9 @@ public class LobeMachine implements Machine{
 
     @Override
     public void sell() {
-        //TODO
+        this.game.lobeMachineFactory.removeFromMachines(this);
+        this.game.global_machines.remove(this);
+        this.game.addToCash(Definitions.getLobeMachineSellingPrice(this.level));
     }
 
     @Override

@@ -35,6 +35,10 @@ public class Definitions {
     {
         return BigInteger.valueOf((long) currLevel * currLevel + 2);
     }
+    public static BigInteger getLobeMachineSellingPrice(int currLevel)
+    {
+        return Definitions.getLobeMachineUpgradeCost(currLevel-1);
+    }
     public static BigInteger getLobeMachinePrice()
     {
         return lobeMachinePrice;
