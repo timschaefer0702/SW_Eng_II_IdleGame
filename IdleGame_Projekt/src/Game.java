@@ -1,13 +1,18 @@
+import java.io.IOException;
 import java.math.BigInteger;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class Game implements Runnable {
 
-    private final long startTime;
-    private final long durationMillis;
+    private long startTime;
+    private long durationMillis;
     private boolean running = false;
+    public boolean getRunning() {
+        return running;
+    }
 
     //Das ist die Variable, in der das Geld des Spiels gespeichert wird jeder Thread
     public BigInteger global_cash;
@@ -28,65 +33,64 @@ public class Game implements Runnable {
 
     private final Warehouse warehouse = new Warehouse(this);
 
-
-
-    private long endTime;
-    private InputHandler inputHandler;
-    private GUIManager guiManager;
-
-
-
-
-
-    public Game(long startTime, int minutes) {
-        this.startTime = startTime;
+    public void setTime(int minutes)
+    {
+        this.startTime = Instant.now().toEpochMilli();
         if (minutes <= 0) { minutes = Integer.MAX_VALUE; }
         this.durationMillis = (long) minutes * 60 * 1000;
-        global_cash = BigInteger.ZERO;
+        endTime = startTime + durationMillis;
+    }
 
-        System.out.println("Projekt gestartet. Deadline in " + minutes + " Minuten.");
+    private long endTime;
+    public InputHandler inputHandler;
+    public GUIManager guiManager;
+
+
+
+
+
+    public Game() {
+        global_cash = BigInteger.ZERO;
     }
 
     @Override
     public void run() {
 
         this.running = true;
-        endTime = startTime + durationMillis;
-        if(init()!=null)
+
+        if(this.init()!=null)
         {
             System.out.println("Error occured while initializing game.");
         }
 
         while (running) {
             long currentTime = System.currentTimeMillis();
-            if (currentTime >= endTime) {
-                System.out.println("Deadline erreicht! Der Ingenieur lässt den Stift fallen.");
-                running = false;
-                break;
+            if ((currentTime >= endTime) && this.guiManager.getState() == GUIManager.GUIState.DEFAULT) {
+                endGame();
             }
 
             try {
                 // 24 ticks / s
-                Thread.sleep(100);
+                Thread.sleep(40);
                 this.guiManager.renderUI();
+                this.guiManager.handleInput();
             } catch (InterruptedException e) {
                 System.err.println("Thread wurde unerwartet unterbrochen!");
                 running = false;
                 Thread.currentThread().interrupt();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
+
     }
 
     public Exception init()
     {
         try {
-            SockMachine startMachine = (SockMachine) sockMachineFactory.createMachine("startMachine");
-            global_machines.add(startMachine);
+
             inputHandler = new InputHandler(this);
             guiManager = new GUIManager(this);
-            Thread konsolenThread = new Thread(inputHandler);
-            konsolenThread.setDaemon(true);
-            konsolenThread.start();
         } catch (Exception e) {
             return e;
         }
@@ -134,6 +138,25 @@ public class Game implements Runnable {
 
     public long getEndTime() {
         return endTime;
+    }
+
+    public void endGame() {
+        this.guiManager.setState(GUIManager.GUIState.ENDSCREEN);
+    }
+
+    public void startGame(String[] args)
+    {
+        SockMachine startMachine = (SockMachine) sockMachineFactory.createMachine("startMachine");
+        global_machines.add(startMachine);
+        int minutes = 10;
+        if (args.length > 1) {
+            try {
+                minutes = Integer.parseInt(args[1]);
+            } catch (NumberFormatException e) {
+            }
+        }
+        this.setTime(minutes);
+
     }
 
 

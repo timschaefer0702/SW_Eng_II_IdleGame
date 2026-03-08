@@ -1,28 +1,28 @@
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
-public class InputHandler implements Runnable {
+public class InputHandler{
     private final Game game;
-    private boolean running = false;
 
     public InputHandler(Game game) {
         this.game = game;
     }
 
-    @Override
-    public void run() {
-        running = true;
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Konsole bereit.Spiel Startet!");
+    public void handleInput(String input) {
+        if (input == null || input.trim().isEmpty()) return;
 
-        while (running) {
-            String input = scanner.nextLine().toLowerCase();
+        String[] args = input.trim().toLowerCase().split("\\s+");
+        String command = args[0];
 
-            String[] args = input.split("\\s+");
-            String command = args[0];
             switch (command) {
+                case "start":
+                    if(this.game.guiManager.getState()==GUIManager.GUIState.STARTSCREEN)
+                    {
+                        this.game.guiManager.setState(GUIManager.GUIState.DEFAULT);
+                        this.game.startGame(args);
+                    }
+                    break;
                 //for test
                 case "cheat":
                     System.out.println("Okay du Frechdachs 🦡 dann Schummel mal los");
@@ -33,25 +33,17 @@ public class InputHandler implements Runnable {
                     exitGame();
                     break;
 
-                case "time":
-                    System.out.println(game.getRemainingTime());
-                    break;
-
                 case "help":
                     //TODO richtige erklärung für Befehle
                     help();
                     break;
 
-                case "cash":
-                    printGameCash();
-                    break;
-
                 case "machines":
-                    printMachines();
+                    this.game.guiManager.setState(GUIManager.GUIState.MACHINES);
                     break;
 
-                case "count":
-                    countProducts(args);
+                case "dashboard":
+                    this.game.guiManager.setState(GUIManager.GUIState.DEFAULT);
                     break;
 
                 case "upgrade":
@@ -59,11 +51,11 @@ public class InputHandler implements Runnable {
                         System.out.println("Keine Maschinen zum Upgraden verfügbar!");
                         break;
                     }
-                    if(this.anfragen("Willst du wirklich diese Maschine upgraden")){this.upgrade(args);};
+                    this.upgrade(args);
                     break;
 
                 case "buy":
-                    if(this.anfragen("Willst du wirklich diese Maschine kaufen")){this.buy(args);};
+                    this.buy(args);
                     break;
 
                 case "sell":
@@ -71,33 +63,19 @@ public class InputHandler implements Runnable {
                         System.out.println("Keine Maschinen zum Verkaufen verfügbar!");
                         break;
                     }
-                    if(this.anfragen("Willst du wirklich diese Maschine verkaufen")){this.sell(args);};
+                    this.sell(args);
                     break;
 
                 default:
-                    System.out.println("Unbekannter Befehl. Brauchst du hilfe?");
-                    if(this.anfragen("")){this.help();};
+                    System.out.println("Unbekannter Befehl. Hier sind die gültigen Befehle");
+                    this.help();
                     break;
             }
-        }
-        scanner.close();
-    }
 
-    public void printGameCash(){
-        System.out.println(this.game.getCash());
-    }
-
-    public void printMachines(){
-        List<Machine> list = this.game.global_machines;
-        for (Machine machine : list) {
-            System.out.println("Maschine vom Typ: "+ machine.getType() + " mit Namen " + machine.getName() + " hat Level: " + machine.getLevel());
-        }
     }
 
     public void exitGame()
     {
-        System.out.println("Herunterfahren wird eingeleitet...");
-        this.running = false;
         game.stopGame();
 
     }
@@ -105,18 +83,6 @@ public class InputHandler implements Runnable {
     public void help()
     {
         System.out.println("Verfügbare Befehle: status, stop");
-    }
-
-    public void countProducts(String[] args)
-    {
-        if(this.game.productList.contains(args[1]))
-        {
-            if(Sock.type.equals(args[1])){System.out.println(this.game.seeSockID());}
-            else if (Lobe.type.equals(args[1])){System.out.println(this.game.seeLobeID());}
-        } else {
-            System.out.println("Produkt nicht gefunden 😢");
-
-            }
     }
 
     public synchronized void upgrade(String[] args)
@@ -176,14 +142,6 @@ public class InputHandler implements Runnable {
         }
     }
 
-    public boolean anfragen (String botschaft)
-    {
-        System.out.println(botschaft + "([y]/[n])");
-        Scanner scanner = new Scanner(System.in);
-        String input = scanner.nextLine().toLowerCase();
-        return input.equalsIgnoreCase("y")||input.equalsIgnoreCase("yes")||input.equalsIgnoreCase("ja");
-    }
-
     public synchronized void sell (String[] args)
     {
         if (args.length<2) {
@@ -215,6 +173,41 @@ public class InputHandler implements Runnable {
             }
         }
         return null;
+    }
+    // TODO VORLÄUFIGER DEADCODE
+
+    public void countProducts(String[] args)
+    {
+        if(this.game.productList.contains(args[1]))
+        {
+            if(Sock.type.equals(args[1])){System.out.println(this.game.seeSockID());}
+            else if (Lobe.type.equals(args[1])){System.out.println(this.game.seeLobeID());}
+        } else {
+            System.out.println("Produkt nicht gefunden 😢");
+
+        }
+    }
+
+    public void printGameCash(){
+        System.out.println(this.game.getCash());
+    }
+
+    public String printMachines() {
+        List<Machine> list = this.game.global_machines;
+
+        if (list.isEmpty()) {
+            return "Keine Maschinen vorhanden.";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (Machine machine : list) {
+            sb.append("- Typ: ").append(machine.getType())
+                    .append(" | Name: ").append(machine.getName())
+                    .append(" | Level: ").append(machine.getLevel())
+                    .append("\n");
+        }
+
+        return sb.toString();
     }
 
 
