@@ -63,17 +63,15 @@ public class GUIManager {
                     break;
                 case HELP:
                     renderHelp();
+                    break;
                 default:
                     renderDashboard();
                     break;
             }
 
-            // --- Trenner ---
-            tg.setForegroundColor(TextColor.ANSI.DEFAULT);
-            tg.putString(2, 15, "--------------------------------------------------------------");
 
-            tg.setForegroundColor(TextColor.ANSI.GREEN);
-            tg.putString(2, 19, "> " + currentUserInput + "_");
+            tg.setForegroundColor(TextColor.ANSI.GREEN_BRIGHT);
+            tg.putString(2, 22, "> " + currentUserInput + "_");
 
             screen.refresh();
 
@@ -94,7 +92,7 @@ public class GUIManager {
     }
 
     public void handleInput() throws IOException {
-        KeyStroke keyStroke = screen.pollInput(); // Nicht-blockierend
+        KeyStroke keyStroke = screen.pollInput();
         if (keyStroke == null) return;
 
         if (this.currentState == GUIState.ENDSCREEN) {
@@ -109,14 +107,10 @@ public class GUIManager {
             }
         } else if (keyStroke.getKeyType() == KeyType.Enter) {
             this.publishCommand(this.currentUserInput);
-            System.out.println("Befehl erkannt");
             this.currentUserInput = "";            // Input-Feld leeren
         }
     }
 
-    public Screen getScreen() {
-        return screen;
-    }
 
     public void publishCommand(String command) {
         if(this.game.getRunning())
@@ -129,26 +123,27 @@ public class GUIManager {
 
     private void renderDashboard()
     {
-        tg.setForegroundColor(TextColor.ANSI.CYAN);
-        tg.putString(2, 1, "┌────────────────────────────────────────────────────────────┐");
-        tg.putString(2, 2, "│  FABRIK-MANAGER 2026 - DASHBOARD                           │");
-        tg.putString(2, 3, "└────────────────────────────────────────────────────────────┘");
+        tg.setForegroundColor(TextColor.ANSI.GREEN_BRIGHT);
+        tg.putString(2, 1, "|~\\ _  _|_ |_  _  _ ._ _|");
+        tg.putString(2, 2, "|_/(_|_\\| ||_)(_)(_|| (_|");
+        tg.putString(2, 3, "──────────────────────────");
 
+        int y = 5;
         tg.setForegroundColor(TextColor.ANSI.WHITE);
-        tg.putString(4,4,"Übrige Zeit:"+ game.getRemainingTime());
-        tg.putString(4, 5,  "Guthaben:    " + game.getCash() + " €");
-        tg.putString(4, 6,  "Produzierte "+ Sock.type+"s:    " + game.seeSockID());
-        tg.putString(4, 7,  "Produzierte "+ Lobe.type+"s:    " + game.seeLobeID());
-        tg.putString(4, 8,  "Maschinen:   " + game.global_machines.size());
+        tg.putString(4, y++,  "Übrige Zeit:    "+ game.getRemainingTime());y++;
+        tg.putString(4, y++,  "Guthaben:       " + game.getCash() + "€");y++;
+        tg.putString(4, y++,  "Produzierte "+ Sock.type+"s:    " + game.seeSockID());y++;
+        tg.putString(4, y++,  "Produzierte "+ Lobe.type+"s:    " + game.seeLobeID());y++;
+        tg.putString(4, y++,  "Maschinen:      " + game.global_machines.size());y++;
     }
 
     private void renderMachines()
     {
-        tg.setForegroundColor(TextColor.ANSI.MAGENTA);
-        tg.putString(2, 1, "┌────────────────────────────────────────────────────────────┐");
-        tg.putString(2, 2, "│  FABRIK-MANAGER 2026 - MASCHINENÜBERSICHT                  │");
-        tg.putString(2, 3, "└────────────────────────────────────────────────────────────┘");
-        tg.setForegroundColor(TextColor.ANSI.YELLOW);
+        tg.setForegroundColor(TextColor.ANSI.GREEN_BRIGHT);
+        tg.putString(2, 1, "|\\/| _  _ _|_ o._  _._ |o __|_ _ ");
+        tg.putString(2, 2, "|  |(_|_\\(_| ||| |}_| |||_\\ | }_");
+        tg.putString(2, 3, "──────────────────────────────────");
+        tg.setForegroundColor(TextColor.ANSI.BLUE_BRIGHT);
         List<Machine> list = game.global_machines;
 
         if (list.isEmpty()) {
@@ -164,50 +159,90 @@ public class GUIManager {
 
     private void renderStartScreen()
     {
-        tg.setForegroundColor(TextColor.ANSI.CYAN);
-        tg.putString(2, 1, "┌────────────────────────────────────────────────────────────┐");
-        tg.putString(2, 2, "│  FABRIK-MANAGER 2026 - START                               │");
-        tg.putString(2, 3, "└────────────────────────────────────────────────────────────┘");
-        tg.setForegroundColor(TextColor.ANSI.WHITE);
-        tg.putString(4, 4, "      (  )    (  )    (  )    (  )");
-        tg.putString(4, 5, "       ||      ||      ||      || ");
-
-        tg.setForegroundColor(TextColor.ANSI.YELLOW); // Fabrikgebäude in Gelb
-        tg.putString(4, 6, "   ____||______||______||______||__________");
-        tg.putString(4, 7, "  /  ____________________________________  \\");
-        tg.putString(4, 8, " |  / [][][][]  [][][][]  [][][][]  [][][][\\ |");
-        tg.putString(4, 9, " | |  [][][][]  [][][][]  [][][][]  [][][][] |");
-        tg.putString(4, 10, " | |           /--------------\\              | |");
-        tg.putString(4, 11," | |          |    [^ _ ^]     |             | |");
-        tg.putString(4, 12," | |           \\--------------/              | |");
-        tg.putString(4, 13," | |________________________________________| |");
-        tg.putString(4, 14," |/__________________________________________\\|");
+        int y=0;
+        tg.setForegroundColor(TextColor.ANSI.GREEN_BRIGHT);
+        tg.putString(2, y++, "                  __  . .* ,");
+        tg.putString(2, y++, "               ~#@#%(\" .,$ @");
+        tg.putString(2, y++, "              .\"^ ';\"");
+        tg.putString(4, y++, "             ..");
+        tg.putString(4, y++, "            ;. :                                   . .");
+        tg.putString(4, y++, "           ;==:                     ,,   ,.@#(&*.;'");
+        tg.putString(4, y++, "           ;. :                   .;#$% & ^^&");
+        tg.putString(4, y++, "           ;==:                   &  ......");
+        tg.putString(4, y++, "           ;. :                   ,,;      :");
+        tg.putString(4, y++,"           ;==:  ._______.       ;  ;      :");
+        tg.putString(4, y++,"          ;. :  ;    ###:__.    ;  ;      :");
+        tg.putString(4, y++,"_________.'  `._;       :  :__.' .'        `.______");
+        tg.putString(4, y++,"start <min> für Spielstart oder help für Commands eingeben.");
+        tg.setForegroundColor(TextColor.ANSI.BLUE_BRIGHT);
+        tg.putString(4, y++, " _______    _           _ _");
+        tg.putString(4, y++, "(_______)  | |         (_) |   ");
+        tg.putString(4, y++, " _____ ____| | _   ____ _| |  _ ____   ____ ____   ____  ____  ____  ____ ");
+        tg.putString(4, y++, "|  ___) _  | || \\ / ___) | | / )    \\ / _  |  _ \\ / _  |/ _  |/ _  )/ ___)");
+        tg.putString(4, y++,"| |  ( ( | | |_) ) |   | | |< (| | | ( ( | | | | ( ( | ( ( | ( (/ /| |  ");
+        tg.putString(4, y++,"|_|   \\_||_|____/|_|   |_|_| \\_)_|_|_|\\_||_|_| |_|\\_||_|\\_|| |\\____)_|  ");
+        tg.putString(4, y++,"                                                       (_____|         ");
     }
     private void renderEndScreen()
     {
         tg.setForegroundColor(TextColor.ANSI.RED);
-        tg.putString(2, 1, "┌────────────────────────────────────────────────────────────┐");
-        tg.putString(2, 2, "│  FABRIK-MANAGER 2026 - SCHICHT-ENDE (ERGEBNIS)             │");
-        tg.putString(2, 3, "└────────────────────────────────────────────────────────────┘");
+        tg.putString(2, 1, "(~ _|_ o _|_ _|_ _._  _| _      [~._(~| _|_ ._ o _");
+        tg.putString(2, 2, "_)(_| ||(_| | | }_| |(_|}_  ~~  [_|  _|}_|_)| ||_\\");
+        tg.putString(2, 3, "───────────────────────────────────────────────────");
 
-        // --- Stats Bereich (Exakt gleiche Positionen wie im Dashboard) ---
+        int y=5;
         tg.setForegroundColor(TextColor.ANSI.WHITE);
-        tg.putString(4, 4, "Status:       ZEIT ABGELAUFEN");
-        tg.putString(4, 5, "Endguthaben:  " + game.getCash() + " €");
-        tg.putString(4, 6, "Gesamt " + Sock.type + "s:  " + game.seeSockID());
-        tg.putString(4, 7, "Gesamt " + Lobe.type + "s:  " + game.seeLobeID());
-        tg.putString(4, 8, "Maschinenpark:" + game.global_machines.size());
+        tg.putString(4, y++, "Status:       ZEIT ABGELAUFEN");y++;
+        tg.putString(4, y++, "Endguthaben:    " + game.getCash() + " €");y++;
+        tg.putString(4, y++, "Gesamt " + Sock.type + "s:   " + game.seeSockID());y++;
+        tg.putString(4, y++, "Gesamt " + Lobe.type + "s:   " + game.seeLobeID());y++;
+        tg.putString(4, y++, "Maschinenpark:  " + game.global_machines.size());y++;
 
-        // --- Footer / Exit Hinweis ---
-        tg.setForegroundColor(TextColor.ANSI.YELLOW);
-        tg.putString(2, 10, "--------------------------------------------------------------");
-        tg.putString(4, 12, "Der Ingenieur lässt den Stift fallen...");
-        tg.putString(4, 14, "DRÜCKE EINE TASTE ZUM BEENDEN DES PROGRAMMS");
+        tg.setForegroundColor(TextColor.ANSI.RED_BRIGHT);
+        tg.putString(2, y++, "--------------------------------------");y++;y++;
+        tg.putString(4, y, "DRÜCKE EINE TASTE ZUM BEENDEN DES SPIELS");
     }
 
     private void renderHelp()
     {
-        tg.setForegroundColor(TextColor.ANSI.MAGENTA);
+        tg.setForegroundColor(TextColor.ANSI.GREEN_BRIGHT);
+        tg.putString(2, 1, "|_|o| |~ _._ _  _._ o o");
+        tg.putString(2, 2, "| |||~|~}_| | |}_| ||_|");
+        tg.putString(2, 3, "───────────────────────");
+        tg.putString(4, 4, "Gültige Befehle");
+        tg.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);
+
+        int y = 5;
+
+        // --- Navigation ---
+        tg.setForegroundColor(TextColor.ANSI.CYAN);
+        tg.putString(4, y++, "NAVIGATION:");
+        tg.setForegroundColor(TextColor.ANSI.WHITE);
+        tg.putString(6, y++, "dashboard          - Zurück zur Statusübersicht");
+        tg.putString(6, y++, "machines           - Liste aller deiner Maschinen anzeigen");
+        tg.putString(6, y++, "help               - Diese Hilfeseite öffnen");
+        y++;
+
+        // --- Management ---
+        tg.setForegroundColor(TextColor.ANSI.CYAN);
+        tg.putString(4, y++, "MANAGEMENT:");
+        tg.setForegroundColor(TextColor.ANSI.WHITE);
+        tg.putString(6, y++, "buy <typ> <name>      - Maschine kaufen (Typ: sockmachine/lobemachine)");
+        tg.putString(6, y++, "upgrade <typ> <name>  - Maschine verbessern (Level erhöhen)");
+        tg.putString(6, y++, "sell <name>           - Eine bestimmte Maschine verkaufen");
+        tg.putString(6, y++, "sell all              - Deinen gesamten Maschinenpark auflösen");
+        y++;
+
+        // --- System ---
+        tg.setForegroundColor(TextColor.ANSI.CYAN);
+        tg.putString(4, y++, "SYSTEM:");
+        tg.setForegroundColor(TextColor.ANSI.WHITE);
+        tg.putString(6, y++, "start <min>        - Spiel starten");
+        tg.putString(6, y  , "stop               - Not Aus - Spiel beenden ohne Ergebnis");
+
+
+
+
     }
 
 

@@ -4,7 +4,7 @@ import java.util.List;
 
 public class InputHandler{
     private final Game game;
-
+    private boolean isStartable = true;
     public InputHandler(Game game) {
         this.game = game;
     }
@@ -17,10 +17,11 @@ public class InputHandler{
 
             switch (command) {
                 case "start":
-                    if(this.game.guiManager.getState()==GUIManager.GUIState.STARTSCREEN)
+                    if((this.game.guiManager.getState()==GUIManager.GUIState.STARTSCREEN || this.game.guiManager.getState()==GUIManager.GUIState.HELP)&&this.isStartable)
                     {
                         this.game.guiManager.setState(GUIManager.GUIState.DEFAULT);
                         this.game.startGame(args);
+                        this.isStartable = false;
                     }
                     break;
                 //for test
