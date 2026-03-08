@@ -142,6 +142,11 @@ public class Game implements Runnable {
 
     public void endGame() {
         this.guiManager.setState(GUIManager.GUIState.ENDSCREEN);
+        for (Machine machine : global_machines) {
+            if (machine != null) {
+                machine.stop();
+            }
+        }
     }
 
     public void startGame(String[] args)

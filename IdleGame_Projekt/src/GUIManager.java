@@ -28,7 +28,11 @@ public class GUIManager {
     }
 
     public enum GUIState {
-        DEFAULT, MACHINES, STARTSCREEN, ENDSCREEN
+        DEFAULT,
+        MACHINES,
+        HELP,
+        STARTSCREEN,
+        ENDSCREEN
     }
     private GUIState currentState = GUIState.STARTSCREEN;
 
@@ -57,6 +61,8 @@ public class GUIManager {
                 case ENDSCREEN:
                     renderEndScreen();
                     break;
+                case HELP:
+                    renderHelp();
                 default:
                     renderDashboard();
                     break;
@@ -179,11 +185,30 @@ public class GUIManager {
     }
     private void renderEndScreen()
     {
-        tg.setForegroundColor(TextColor.ANSI.CYAN);
+        tg.setForegroundColor(TextColor.ANSI.RED);
         tg.putString(2, 1, "┌────────────────────────────────────────────────────────────┐");
-        tg.putString(2, 2, "│  FABRIK-MANAGER 2026 - ENDE                                │");
+        tg.putString(2, 2, "│  FABRIK-MANAGER 2026 - SCHICHT-ENDE (ERGEBNIS)             │");
         tg.putString(2, 3, "└────────────────────────────────────────────────────────────┘");
-        tg.putString(4, 6, "OIIAIOIIAIIAIAIAIAIIAIAIAIAIAIAI");
+
+        // --- Stats Bereich (Exakt gleiche Positionen wie im Dashboard) ---
+        tg.setForegroundColor(TextColor.ANSI.WHITE);
+        tg.putString(4, 4, "Status:       ZEIT ABGELAUFEN");
+        tg.putString(4, 5, "Endguthaben:  " + game.getCash() + " €");
+        tg.putString(4, 6, "Gesamt " + Sock.type + "s:  " + game.seeSockID());
+        tg.putString(4, 7, "Gesamt " + Lobe.type + "s:  " + game.seeLobeID());
+        tg.putString(4, 8, "Maschinenpark:" + game.global_machines.size());
+
+        // --- Footer / Exit Hinweis ---
+        tg.setForegroundColor(TextColor.ANSI.YELLOW);
+        tg.putString(2, 10, "--------------------------------------------------------------");
+        tg.putString(4, 12, "Der Ingenieur lässt den Stift fallen...");
+        tg.putString(4, 14, "DRÜCKE EINE TASTE ZUM BEENDEN DES PROGRAMMS");
     }
+
+    private void renderHelp()
+    {
+        tg.setForegroundColor(TextColor.ANSI.MAGENTA);
+    }
+
 
 }

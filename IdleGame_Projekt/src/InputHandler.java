@@ -34,8 +34,7 @@ public class InputHandler{
                     break;
 
                 case "help":
-                    //TODO richtige erklärung für Befehle
-                    help();
+                    this.game.guiManager.setState(GUIManager.GUIState.HELP);
                     break;
 
                 case "machines":
@@ -67,8 +66,6 @@ public class InputHandler{
                     break;
 
                 default:
-                    System.out.println("Unbekannter Befehl. Hier sind die gültigen Befehle");
-                    this.help();
                     break;
             }
 
@@ -80,10 +77,7 @@ public class InputHandler{
 
     }
 
-    public void help()
-    {
-        System.out.println("Verfügbare Befehle: status, stop");
-    }
+
 
     public synchronized void upgrade(String[] args)
     {
