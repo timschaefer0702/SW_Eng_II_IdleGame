@@ -46,7 +46,7 @@ public class LobeMachine implements Machine{
             this.production_interval = (int) (this.production_interval * 0.95);
             return true;
         }else {
-            System.out.println("Zu wenig Cash! Du benötoigst " + Definitions.getSockMachineUpgradeCost(this.level) + " Du hast " + this.game.getCash() + " Cash");
+            this.game.guiManager.setCommandReturn("Zu wenig Cash! Du benötoigst " + Definitions.getSockMachineUpgradeCost(this.level) + " Du hast " + this.game.getCash() + " Cash");
             return false;
         }
 

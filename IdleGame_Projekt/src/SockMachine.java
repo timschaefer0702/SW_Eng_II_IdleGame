@@ -49,7 +49,7 @@ public class SockMachine implements Machine {
             return true;
         }
         else {
-            System.out.println("Zu wenig Cash! Du benötoigst " + Definitions.getSockMachineUpgradeCost(this.level) + " Du hast " + this.game.getCash() + " Cash");
+            this.game.guiManager.setCommandReturn("Zu wenig Cash! Du benötoigst " + Definitions.getSockMachineUpgradeCost(this.level) + " Du hast " + this.game.getCash() + " Cash");
             return false;
         }
 

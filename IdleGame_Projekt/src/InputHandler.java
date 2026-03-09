@@ -22,6 +22,8 @@ public class InputHandler{
                         this.game.guiManager.setState(GUIManager.GUIState.DEFAULT);
                         this.game.startGame(args);
                         this.isStartable = false;
+                    }else{
+                        this.game.guiManager.setCommandReturn("Spiel kann von hier aus nicht gestartet werden.");
                     }
                     break;
                 //for test
@@ -46,9 +48,13 @@ public class InputHandler{
                     this.game.guiManager.setState(GUIManager.GUIState.DEFAULT);
                     break;
 
+                case "sales":
+                    this.game.guiManager.setState(GUIManager.GUIState.SALES);
+                    break;
+
                 case "upgrade":
                     if(game.global_machines.isEmpty()) {
-                        System.out.println("Keine Maschinen zum Upgraden verfügbar!");
+                        this.game.guiManager.setCommandReturn("keine Maschinen zum Upgraden vorhanden!");
                         break;
                     }
                     this.upgrade(args);
@@ -60,56 +66,78 @@ public class InputHandler{
 
                 case "sell":
                     if(game.global_machines.isEmpty()) {
-                        System.out.println("Keine Maschinen zum Verkaufen verfügbar!");
+                        this.game.guiManager.setCommandReturn("Keine Maschinen zum Verkaufen verfügbar!");
                         break;
                     }
                     this.sell(args);
                     break;
 
+                case "hire":
+                    this.hireNewSalesAgent(args);
+                    break;
+
+                case "promote":
+                    this.promoteSalesAgent(args);
+                    break;
+
+                case "fire":
+                    this.fireSalesAgent(args);
+                    break;
+
+                case "finish":
+                    this.game.endGame();
+                    break;
+
+                case "expand":
+                    this.upgradeWarehouse();
+                    break;
+
                 default:
+                    this.game.guiManager.setCommandReturn("Kein gültiger Command");
                     break;
             }
 
     }
 
+    //General
+
     public void exitGame()
     {
         game.stopGame();
-
     }
 
-
+    //Machines
 
     public synchronized void upgrade(String[] args)
     {
         if (args.length<3) {
-            System.out.println("Bitte Art und Name der Maschine eingeben!");
+            this.game.guiManager.setCommandReturn("Nutze upgrade <type> <name>");
         }else if (!args[1].isEmpty() && this.game.typeList.contains(args[1])) {
             Machine target = this.findMachineWithName(args[2]);
             if (target != null && target.upgrade()) {
-                System.out.println(target.getType() + " "+ target.getName() + " upgraded!");
+                this.game.guiManager.setCommandReturn(target.getType() + " "+ target.getName() + " upgraded!");
             }
-        }
-            else{
-            System.out.println("Schreibfehler!");
+        } else{
+            this.game.guiManager.setCommandReturn("Schreibfehler in Maschinentyp oder Name");
         }
     }
 
     public synchronized void buy(String[] args)
     {
         if (args.length<3) {
-            System.out.println("Bitte Art und Name der Maschine eingeben!");
-        }else if(!this.game.isNameUnique(args[2])){
-            System.out.println("Es gibt schon eine Maschine mit dem Namen " + args[2] + " !");
+            this.game.guiManager.setCommandReturn("Nutze buy <type> <name>");
+        }else if(!this.game.isMachineNameUnique(args[2])) {
+            this.game.guiManager.setCommandReturn("Maschine: " + args[2] + "bereits gekauft!");
+        }else if(args[2].equalsIgnoreCase("all")){
+            this.game.guiManager.setCommandReturn("Bitte die Maschine nicht \"all\" nennen!");
         } else if (args[1].equalsIgnoreCase("sockmachine")) {
             this.buySockmachine(args[2]);
         } else if (args[1].equalsIgnoreCase("lobemachine")) {
             this.buyLobemachine(args[2]);
         } else{
-            System.out.println("Schreibfehler!");
+            this.game.guiManager.setCommandReturn("Schreibfehler in Maschinentyp oder Name");
         }
     }
-
 
     public void buySockmachine (String name)
     {
@@ -118,9 +146,9 @@ public class InputHandler{
             this.game.payWithCash(Definitions.getSockMachinePrice());
             Machine machine = this.game.sockMachineFactory.createMachine(name);
             game.global_machines.add(machine);
-            System.out.println(machine.getType() + " " + machine.getName() + " bought!");
+            this.game.guiManager.setCommandReturn(machine.getType() + " " + machine.getName() + " bought!");
         }else {
-            System.out.println("Zu wenig Cash! Du benötoigst " + Definitions.getSockMachinePrice() + " Du hast " + this.game.getCash() + " Cash");
+            this.game.guiManager.setCommandReturn("Zu wenig Cash! Du benötoigst " + Definitions.getSockMachinePrice() + " Du hast " + this.game.getCash() + " Cash");
         }
     }
 
@@ -131,31 +159,37 @@ public class InputHandler{
             this.game.payWithCash(Definitions.getLobeMachinePrice());
             Machine machine = this.game.lobeMachineFactory.createMachine(name);
             game.global_machines.add(machine);
-            System.out.println(machine.getType() + " " + machine.getName() + " bought!");
+            this.game.guiManager.setCommandReturn(machine.getType() + " " + machine.getName() + " bought!");
         }else{
-            System.out.println("Zu wenig Cash! Du benötoigst " + Definitions.getLobeMachinePrice() + " Du hast " + this.game.getCash() + " Cash");
+            this.game.guiManager.setCommandReturn("Zu wenig Cash! Du benötoigst " + Definitions.getLobeMachinePrice() + " Du hast " + this.game.getCash() + " Cash");
         }
     }
 
     public synchronized void sell (String[] args)
     {
         if (args.length<2) {
-            System.out.println("Bitte Name der Maschine oder all eingeben!");
+            this.game.guiManager.setCommandReturn("Nutze sell <name>/all");
         }
         else if (args[1].contentEquals("all")) {
-            List<Machine> list = new ArrayList<>();
-            for (Machine machine : this.game.global_machines) {
-                list.add(machine);
-                machine.stop();
-            }
-            for (Machine machine : list) {
-                machine.sell();
+            if(this.game.global_machines.isEmpty()) {
+                this.game.guiManager.setCommandReturn("Keine Maschine zum verkaufen vorhanden");
+            }else{
+                List<Machine> list = new ArrayList<>();
+                for (Machine machine : this.game.global_machines) {
+                    list.add(machine);
+                    machine.stop();
+                }
+                for (Machine machine : list) {
+                    machine.sell();
+                    this.game.guiManager.setCommandReturn("Alle Maschinen verkauft!");
+                }
             }
         }
         else{
             Machine target = this.findMachineWithName(args[1]);
             if (target != null) {
                 target.sell();
+                this.game.guiManager.setCommandReturn("Maschine " + target.getType() + " " + target.getName() + " verkauft!");
             }
         }
     }
@@ -169,44 +203,101 @@ public class InputHandler{
         }
         return null;
     }
-    // TODO VORLÄUFIGER DEADCODE
 
-    public void countProducts(String[] args)
-    {
-        if(this.game.productList.contains(args[1]))
-        {
-            if(Sock.type.equals(args[1])){System.out.println(this.game.seeSockID());}
-            else if (Lobe.type.equals(args[1])){System.out.println(this.game.seeLobeID());}
+    //Sales Agents
+
+    public void hireNewSalesAgent (String[] args){
+        if (args.length < 3) {
+            this.game.guiManager.setCommandReturn("Nutze: hire <name> <"+Sock.type+"|"+Lobe.type+">");
+            return;
+        }
+        String name = args[1];
+        String fokus = args[2].toLowerCase();
+        if (!this.game.isAgentNameUnique(name)) {
+            this.game.guiManager.setCommandReturn("Der Mitarbeiter " + name + " ist bereits eingestellt!");
+            return;
+        }
+        if (!this.game.productList.contains(fokus)) {
+            this.game.guiManager.setCommandReturn("Ungültiger Fokus! Verfügbar: " + this.game.productList);
+            return;
+        }
+        BigInteger hirePrice = Definitions.getSalesAgentHirePrice();
+        if (this.game.getCash().compareTo(hirePrice) >= 0) {
+            this.game.payWithCash(hirePrice);
+            this.game.hireSalesAgent(name, fokus);
+            this.game.guiManager.setCommandReturn("Mitarbeiter " + name + "spezialisiert auf " + fokus + "eingestellt!");
         } else {
-            System.out.println("Produkt nicht gefunden 😢");
-
+            this.game.guiManager.setCommandReturn("Zu wenig Cash! Benötigt: " + hirePrice + "€");
         }
     }
 
-    public void printGameCash(){
-        System.out.println(this.game.getCash());
+    public void promoteSalesAgent (String[] args)
+    {
+        if (args.length < 2) {
+            this.game.guiManager.setCommandReturn("Nutze: promote <name>");
+            return;
+        }
+        String name = args[1];
+        SalesAgent agent = this.game.findAgentWithName(name);
+
+        if (agent == null) {
+            this.game.guiManager.setCommandReturn("Verkäufer '" + name + "' wurde nicht gefunden.");
+            return;
+        }
+        if (agent.getLevel() >= Definitions.getSalesAgentMaxLevel()) {
+            this.game.guiManager.setCommandReturn(name + " hat bereits das höchste Level!");
+            return;
+        }
+        BigInteger promoCost = Definitions.getSalesAgentPromotionCost(agent.getLevel());
+        if (this.game.getCash().compareTo(promoCost) >= 0) {
+            this.game.payWithCash(promoCost);
+            agent.promote();
+            this.game.guiManager.setCommandReturn(name + "wurde auf Stufe" + agent.getLevel() + "befördert!");
+        } else {
+            this.game.guiManager.setCommandReturn("Beförderung zu teuer! Kosten: " + promoCost + "€");
+        }
     }
 
-    public String printMachines() {
-        List<Machine> list = this.game.global_machines;
-
-        if (list.isEmpty()) {
-            return "Keine Maschinen vorhanden.";
+    public void fireSalesAgent(String[] args)
+    {
+        if (args.length<2) {
+            this.game.guiManager.setCommandReturn("Nutze fire <name>/all");
         }
+        else if (args[1].contentEquals("all")) {
+            if(this.game.global_salesAgents.isEmpty()) {
+                this.game.guiManager.setCommandReturn("Kein Mitarbeiter zum feuern vorhanden");
+            }else{
 
-        StringBuilder sb = new StringBuilder();
-        for (Machine machine : list) {
-            sb.append("- Typ: ").append(machine.getType())
-                    .append(" | Name: ").append(machine.getName())
-                    .append(" | Level: ").append(machine.getLevel())
-                    .append("\n");
+                for (SalesAgent agent : this.game.global_salesAgents) {
+                    agent.stop();
+                }
+                this.game.global_salesAgents.clear();
+                this.game.guiManager.setCommandReturn("Alle Mitarbeiter wurden gefeuert!");
+            }
         }
-
-        return sb.toString();
+        else{
+            SalesAgent target = this.game.findAgentWithName(args[1]);
+            if (target != null) {
+                target.fire();
+                this.game.guiManager.setCommandReturn("Mitarbeiter " + target.getName() + " wurde gefeuert!");
+            }
+        }
     }
 
+    public void upgradeWarehouse()
+    {
+        BigInteger upgradeCost = Definitions.getWarehouseUpgradeCost(this.game.getWarehouse().getLevel());
 
+        if (this.game.getCash().compareTo(upgradeCost) >= 0) {
+            this.game.payWithCash(upgradeCost);
 
+            this.game.getWarehouse().expand();
 
+            this.game.guiManager.setCommandReturn("Lager erweitert! Neue Kapazität: " +
+                    this.game.getWarehouse().getCapacity());
+        } else {
+            this.game.guiManager.setCommandReturn("Zu wenig Cash! Upgrade kostet " + upgradeCost + "€");
+        }
 
+    }
 }

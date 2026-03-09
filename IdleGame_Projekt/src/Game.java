@@ -19,6 +19,7 @@ public class Game implements Runnable {
 
     //Dies ist die Liste in der sich alle gekauften Maschinen befinden
     public List<Machine> global_machines = new ArrayList<>();
+    public List<SalesAgent> global_salesAgents = new ArrayList<>();
     public List<String> typeList = List.of(SockMachine.type,LobeMachine.type);
     public List<String> productList = List.of(Sock.type,Lobe.type);
 
@@ -31,7 +32,7 @@ public class Game implements Runnable {
     public long seeSockID() { return sockCounter.get();}
     public long seeLobeID() { return lobeCounter.get();}
 
-    private final Warehouse warehouse = new Warehouse(this);
+    private final Warehouse warehouse = new Warehouse(this, 5);
 
     public void setTime(int minutes)
     {
@@ -45,10 +46,6 @@ public class Game implements Runnable {
     public InputHandler inputHandler;
     public GUIManager guiManager;
 
-
-
-
-
     public Game() {
         global_cash = BigInteger.ZERO;
     }
@@ -57,7 +54,6 @@ public class Game implements Runnable {
     public void run() {
 
         this.running = true;
-
         if(this.init()!=null)
         {
             System.out.println("Error occured while initializing game.");
@@ -68,7 +64,6 @@ public class Game implements Runnable {
             if ((currentTime >= endTime) && this.guiManager.getState() == GUIManager.GUIState.DEFAULT) {
                 endGame();
             }
-
             try {
                 // 24 ticks / s
                 Thread.sleep(40);
@@ -82,13 +77,11 @@ public class Game implements Runnable {
                 throw new RuntimeException(e);
             }
         }
-
     }
 
     public Exception init()
     {
         try {
-
             inputHandler = new InputHandler(this);
             guiManager = new GUIManager(this);
         } catch (Exception e) {
@@ -119,11 +112,20 @@ public class Game implements Runnable {
         global_cash = global_cash.subtract(cash);
     }
 
-    public boolean isNameUnique (String name)
+    public boolean isMachineNameUnique(String name)
     {
         if (name == null) return false;
         for (Machine machine : global_machines) {
             if(name.equalsIgnoreCase(machine.getName())){return false;}
+        }
+        return true;
+    }
+
+    public boolean isAgentNameUnique(String name)
+    {
+        if (name == null) return false;
+        for (SalesAgent salesAgent : global_salesAgents) {
+            if(name.equalsIgnoreCase(salesAgent.getName())){return false;}
         }
         return true;
     }
@@ -136,10 +138,6 @@ public class Game implements Runnable {
         return String.format("%02d:%02d", totalSeconds / 60, totalSeconds % 60);
     }
 
-    public long getEndTime() {
-        return endTime;
-    }
-
     public void endGame() {
         this.guiManager.setState(GUIManager.GUIState.ENDSCREEN);
         for (Machine machine : global_machines) {
@@ -147,12 +145,18 @@ public class Game implements Runnable {
                 machine.stop();
             }
         }
+        for (SalesAgent salesAgent : global_salesAgents) {
+            if(salesAgent != null) {
+                salesAgent.stop();
+            }
+        }
     }
 
     public void startGame(String[] args)
     {
-        SockMachine startMachine = (SockMachine) sockMachineFactory.createMachine("startMachine");
+        SockMachine startMachine = (SockMachine) sockMachineFactory.createMachine("start");
         global_machines.add(startMachine);
+        this.hireSalesAgent("HansUmsatz", Sock.type);
         int minutes = 10;
         if (args.length > 1) {
             try {
@@ -161,10 +165,24 @@ public class Game implements Runnable {
             }
         }
         this.setTime(minutes);
-
     }
 
+    public void hireSalesAgent(String name, String fokus) {
+        SalesAgent salesAgent = new SalesAgent(name,this, fokus);
 
+        Thread thread = new Thread(salesAgent);
+        thread.setDaemon(true);
+        thread.start();
 
+        global_salesAgents.add(salesAgent);
+    }
 
+    public SalesAgent findAgentWithName(String name) {
+        for (SalesAgent agent : this.global_salesAgents) {
+            if (agent.getName().equalsIgnoreCase(name)) {
+                return agent;
+            }
+        }
+        return null;
+    }
 }
