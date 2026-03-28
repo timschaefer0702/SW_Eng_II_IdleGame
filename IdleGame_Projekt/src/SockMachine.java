@@ -75,7 +75,7 @@ public class SockMachine implements Machine {
     @Override
     public synchronized void sell() {
         this.game.sockMachineFactory.removeFromMachines(this);
-        this.game.global_machines.remove(this);
+        this.game.getMachines().remove(this);
         this.game.addToCash(BigInteger.valueOf(Definitions.getSockMachineSellingPrice(this.level)));
     }
 

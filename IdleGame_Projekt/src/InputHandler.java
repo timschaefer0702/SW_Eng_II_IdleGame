@@ -11,11 +11,12 @@ public class InputHandler{
 
     public void handleInput(String input) {
         if (input == null || input.trim().isEmpty()) return;
-
+        //input command in string array für einfachere verwendung
         String[] args = input.trim().toLowerCase().split("\\s+");
         String command = args[0];
 
             switch (command) {
+                // spiel kann nur aus dem startscreen oder help gestartet werden und kann nur einmal gestartet werdeb
                 case "start":
                     if((this.game.guiManager.getState()==GUIManager.GUIState.STARTSCREEN || this.game.guiManager.getState()==GUIManager.GUIState.HELP)&&this.isStartable)
                     {
@@ -35,7 +36,7 @@ public class InputHandler{
                 case "stop":
                     exitGame();
                     break;
-
+                //sichten umschalten
                 case "help":
                     this.game.guiManager.setState(GUIManager.GUIState.HELP);
                     break;
@@ -51,9 +52,9 @@ public class InputHandler{
                 case "sales":
                     this.game.guiManager.setState(GUIManager.GUIState.SALES);
                     break;
-
+                //aktionen im spiel
                 case "upgrade":
-                    if(game.global_machines.isEmpty()) {
+                    if(game.getMachines().isEmpty()) {
                         this.game.guiManager.setCommandReturn("keine Maschinen zum Upgraden vorhanden!");
                         break;
                     }
@@ -65,7 +66,7 @@ public class InputHandler{
                     break;
 
                 case "sell":
-                    if(game.global_machines.isEmpty()) {
+                    if(game.getMachines().isEmpty()) {
                         this.game.guiManager.setCommandReturn("Keine Maschinen zum Verkaufen verfügbar!");
                         break;
                     }
@@ -145,7 +146,7 @@ public class InputHandler{
         {
             this.game.payWithCash(Definitions.getSockMachinePrice());
             Machine machine = this.game.sockMachineFactory.createMachine(name);
-            game.global_machines.add(machine);
+            game.getMachines().add(machine);
             this.game.guiManager.setCommandReturn(machine.getType() + " " + machine.getName() + " bought!");
         }else {
             this.game.guiManager.setCommandReturn("Zu wenig Cash! Du benötoigst " + Definitions.getSockMachinePrice() + " Du hast " + this.game.getCash() + " Cash");
@@ -158,7 +159,7 @@ public class InputHandler{
         {
             this.game.payWithCash(Definitions.getLobeMachinePrice());
             Machine machine = this.game.lobeMachineFactory.createMachine(name);
-            game.global_machines.add(machine);
+            game.getMachines().add(machine);
             this.game.guiManager.setCommandReturn(machine.getType() + " " + machine.getName() + " bought!");
         }else{
             this.game.guiManager.setCommandReturn("Zu wenig Cash! Du benötoigst " + Definitions.getLobeMachinePrice() + " Du hast " + this.game.getCash() + " Cash");
@@ -171,11 +172,11 @@ public class InputHandler{
             this.game.guiManager.setCommandReturn("Nutze sell <name>/all");
         }
         else if (args[1].contentEquals("all")) {
-            if(this.game.global_machines.isEmpty()) {
+            if(this.game.getMachines().isEmpty()) {
                 this.game.guiManager.setCommandReturn("Keine Maschine zum verkaufen vorhanden");
             }else{
                 List<Machine> list = new ArrayList<>();
-                for (Machine machine : this.game.global_machines) {
+                for (Machine machine : this.game.getMachines()) {
                     list.add(machine);
                     machine.stop();
                 }
@@ -196,7 +197,7 @@ public class InputHandler{
 
     public Machine findMachineWithName (String name)
     {
-        for (Machine m : this.game.global_machines) {
+        for (Machine m : this.game.getMachines()) {
             if (m.getName() != null && m.getName().equalsIgnoreCase(name)) {
                 return m;
             }
@@ -206,7 +207,7 @@ public class InputHandler{
 
     //Sales Agents
 
-    public void hireNewSalesAgent (String[] args){
+    public synchronized void hireNewSalesAgent (String[] args){
         if (args.length < 3) {
             this.game.guiManager.setCommandReturn("Nutze: hire <name> <"+Sock.type+"|"+Lobe.type+">");
             return;
@@ -225,13 +226,13 @@ public class InputHandler{
         if (this.game.getCash().compareTo(hirePrice) >= 0) {
             this.game.payWithCash(hirePrice);
             this.game.hireSalesAgent(name, fokus);
-            this.game.guiManager.setCommandReturn("Mitarbeiter " + name + "spezialisiert auf " + fokus + "eingestellt!");
+            this.game.guiManager.setCommandReturn("Mitarbeiter " + name + " spezialisiert auf " + fokus + " eingestellt!");
         } else {
             this.game.guiManager.setCommandReturn("Zu wenig Cash! Benötigt: " + hirePrice + "€");
         }
     }
 
-    public void promoteSalesAgent (String[] args)
+    public synchronized void promoteSalesAgent (String[] args)
     {
         if (args.length < 2) {
             this.game.guiManager.setCommandReturn("Nutze: promote <name>");
@@ -252,26 +253,26 @@ public class InputHandler{
         if (this.game.getCash().compareTo(promoCost) >= 0) {
             this.game.payWithCash(promoCost);
             agent.promote();
-            this.game.guiManager.setCommandReturn(name + "wurde auf Stufe" + agent.getLevel() + "befördert!");
+            this.game.guiManager.setCommandReturn(name + " wurde auf Stufe " + agent.getLevel() + " befördert!");
         } else {
             this.game.guiManager.setCommandReturn("Beförderung zu teuer! Kosten: " + promoCost + "€");
         }
     }
 
-    public void fireSalesAgent(String[] args)
+    public synchronized void fireSalesAgent(String[] args)
     {
         if (args.length<2) {
             this.game.guiManager.setCommandReturn("Nutze fire <name>/all");
         }
         else if (args[1].contentEquals("all")) {
-            if(this.game.global_salesAgents.isEmpty()) {
+            if(this.game.getSalesAgents().isEmpty()) {
                 this.game.guiManager.setCommandReturn("Kein Mitarbeiter zum feuern vorhanden");
             }else{
 
-                for (SalesAgent agent : this.game.global_salesAgents) {
+                for (SalesAgent agent : this.game.getSalesAgents()) {
                     agent.stop();
                 }
-                this.game.global_salesAgents.clear();
+                this.game.getSalesAgents().clear();
                 this.game.guiManager.setCommandReturn("Alle Mitarbeiter wurden gefeuert!");
             }
         }

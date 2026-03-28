@@ -12,10 +12,6 @@ public class Lobe extends ProducedObject {
         this.machineName = machineName;
     }
 
-    public long getId() {
-        return id;
-    }
-
     public String toString()
     {
         return "LobeNr: " + id + " produced by " + machineName + " at: " + timeOfCreation.getHour() +":"+ timeOfCreation.getMinute() +":"+ timeOfCreation.getSecond();
