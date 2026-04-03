@@ -15,13 +15,13 @@ public class Game implements Runnable {
     }
 
     //Das ist die Variable, in der das Geld des Spiels gespeichert wird jeder Thread
-    public BigInteger global_cash;
+    private BigInteger global_cash;
 
     //Dies ist die Liste in der sich alle gekauften Maschinen befinden
-    public List<Machine> global_machines = new ArrayList<>();
-    public List<SalesAgent> global_salesAgents = new ArrayList<>();
-    public List<String> typeList = List.of(SockMachine.type,LobeMachine.type);
-    public List<String> productList = List.of(Sock.type,Lobe.type);
+    private List<Machine> global_machines = new ArrayList<>();
+    private List<SalesAgent> global_salesAgents = new ArrayList<>();
+    public final List<String> typeList = List.of(SockMachine.type,LobeMachine.type);
+    public final List<String> productList = List.of(Sock.type,Lobe.type);
 
     public SockMachineFactory sockMachineFactory = new SockMachineFactory(this);
     public LobeMachineFactory lobeMachineFactory = new LobeMachineFactory(this);
@@ -54,18 +54,20 @@ public class Game implements Runnable {
     public void run() {
 
         this.running = true;
+        //einmal initen dann run in loop
         if(this.init()!=null)
         {
             System.out.println("Error occured while initializing game.");
         }
 
         while (running) {
+            //berechnung wann spiel ausläuft
             long currentTime = System.currentTimeMillis();
             if ((currentTime >= endTime) && this.guiManager.getState() == GUIManager.GUIState.DEFAULT) {
                 endGame();
             }
             try {
-                // 24 ticks / s
+                // 25 ticks / s
                 Thread.sleep(40);
                 this.guiManager.renderUI();
                 this.guiManager.handleInput();
@@ -116,7 +118,7 @@ public class Game implements Runnable {
     public boolean isMachineNameUnique(String name)
     {
         if (name == null) return false;
-        for (Machine machine : global_machines) {
+        for (Machine machine : this.getMachines()) {
             if(name.equalsIgnoreCase(machine.getName())){return false;}
         }
         return true;
@@ -125,7 +127,7 @@ public class Game implements Runnable {
     public boolean isAgentNameUnique(String name)
     {
         if (name == null) return false;
-        for (SalesAgent salesAgent : global_salesAgents) {
+        for (SalesAgent salesAgent : this.getSalesAgents()) {
             if(name.equalsIgnoreCase(salesAgent.getName())){return false;}
         }
         return true;
@@ -141,12 +143,12 @@ public class Game implements Runnable {
 
     public void endGame() {
         this.guiManager.setState(GUIManager.GUIState.ENDSCREEN);
-        for (Machine machine : global_machines) {
+        for (Machine machine : this.getMachines()) {
             if (machine != null) {
                 machine.stop();
             }
         }
-        for (SalesAgent salesAgent : global_salesAgents) {
+        for (SalesAgent salesAgent : this.getSalesAgents()) {
             if(salesAgent != null) {
                 salesAgent.stop();
             }
@@ -156,7 +158,7 @@ public class Game implements Runnable {
     public void startGame(String[] args)
     {
         SockMachine startMachine = (SockMachine) sockMachineFactory.createMachine("start");
-        global_machines.add(startMachine);
+        this.getMachines().add(startMachine);
         this.hireSalesAgent("HansUmsatz", Sock.type);
         int minutes = 10;
         if (args.length > 1) {
@@ -175,15 +177,23 @@ public class Game implements Runnable {
         thread.setDaemon(true);
         thread.start();
 
-        global_salesAgents.add(salesAgent);
+        this.getSalesAgents().add(salesAgent);
     }
 
     public SalesAgent findAgentWithName(String name) {
-        for (SalesAgent agent : this.global_salesAgents) {
+        for (SalesAgent agent : this.getSalesAgents()) {
             if (agent.getName().equalsIgnoreCase(name)) {
                 return agent;
             }
         }
         return null;
+    }
+
+    public synchronized List<Machine> getMachines() {
+        return this.global_machines;
+    }
+
+    public synchronized List<SalesAgent> getSalesAgents() {
+        return this.global_salesAgents;
     }
 }

@@ -19,8 +19,8 @@ public class Warehouse {
     private final ConcurrentLinkedDeque<Sock> sockWarehouse = new ConcurrentLinkedDeque<>();
     private final ConcurrentLinkedDeque<Lobe> lobeWarehouse = new ConcurrentLinkedDeque<>();
 
-    public synchronized boolean hasSockWarehouseSpace() {return sockWarehouse.size() < capacity;}
-    public synchronized boolean hasLobeWarehouseSpace() {return lobeWarehouse.size() < capacity;}
+    public synchronized boolean hasSockWarehouseSpace() {return sockWarehouse.size() < this.capacity;}
+    public synchronized boolean hasLobeWarehouseSpace() {return lobeWarehouse.size() < this.capacity;}
 
 
     //generelle push und pop funktionen für alle Warehouses egal welches Objekt in welche Liste gepackt wird
@@ -42,7 +42,7 @@ public class Warehouse {
         {
             this.push(sockWarehouse, sock);
         }else{
-            this.game.guiManager.setCommandReturn("LAGER VOLL: "+ Sock.type +"wurde weggeworfen!");
+            this.game.guiManager.setCommandReturn("LAGER VOLL: "+ Sock.type +" wurde weggeworfen!");
         }
 
     }
@@ -54,7 +54,7 @@ public class Warehouse {
         {
             this.push(lobeWarehouse, lobe);
         }else{
-            this.game.guiManager.setCommandReturn("LAGER VOLL: "+ Lobe.type +"wurde weggeworfen!");
+            this.game.guiManager.setCommandReturn("LAGER VOLL: "+ Lobe.type +" wurde weggeworfen!");
         }
 
     }
@@ -69,12 +69,12 @@ public class Warehouse {
         return null;
     }
 
-    public int getSockStock()
+    public synchronized int getSockStock()
     {
         return sockWarehouse.size();
     }
 
-    public int getLobeStock()
+    public synchronized int getLobeStock()
     {
         return lobeWarehouse.size();
     }
@@ -83,16 +83,18 @@ public class Warehouse {
         return capacity;
     }
 
+    //für anzeige auf dashboard
     public int getSockUtilization() {
         if (capacity <= 0) return 0;
-        return (int) ((double) sockWarehouse.size() / capacity * 100);
+        return (int) ((double) this.getSockStock() / capacity * 100);
     }
 
     public int getLobeUtilization() {
         if (capacity <= 0) return 0;
-        return (int) ((double) lobeWarehouse.size() / capacity * 100);
+        return (int) ((double) this.getLobeStock() / capacity * 100);
     }
 
+    //statische upgradegröße
     public synchronized void expand() {
         this.capacity += 3;
         this.level++;

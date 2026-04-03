@@ -103,7 +103,7 @@ public class SalesAgent implements Runnable {
 
     public void fire() {
         this.stop();
-        this.game.global_salesAgents.remove(this);
+        this.game.getSalesAgents().remove(this);
     }
 
     public BigInteger getGeneratedCash() { return this.generated_cash; }

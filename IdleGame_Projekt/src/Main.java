@@ -8,5 +8,4 @@ public class Main {
         Thread gameThread = new Thread(game);
         gameThread.start();
     }
-    //TODO Warehouse kapazität upgraden
 }

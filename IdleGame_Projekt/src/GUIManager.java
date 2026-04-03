@@ -116,6 +116,7 @@ public class GUIManager {
         if (this.currentState == GUIState.ENDSCREEN) {
             this.game.stopGame();
             return;
+
         }
         if (keyStroke.getKeyType() == KeyType.Character) {
             this.currentUserInput += keyStroke.getCharacter();
@@ -205,8 +206,8 @@ public class GUIManager {
         tg.putString(4, y++, Lobe.type + "s im Lager:   " + game.getWarehouse().getLobeStock() + " Auslastung von "+ game.getWarehouse().getLobeUtilization()+ "%");
         y++;
 
-        tg.putString(4, y++, "Maschinen:          " + game.global_machines.size());
-        tg.putString(4, y++, "Mitarbeiter:        " + game.global_salesAgents.size());
+        tg.putString(4, y++, "Maschinen:          " + game.getMachines().size());
+        tg.putString(4, y++, "Mitarbeiter:        " + game.getSalesAgents().size());
         y++;
 
         tg.setForegroundColor(TextColor.ANSI.GREEN_BRIGHT);
@@ -223,7 +224,7 @@ public class GUIManager {
         tg.putString(2, 1, "|\\/|  /\\  /__` /  ` |__| | |\\ | |__  |\\ |");
         tg.putString(2, 2, "|  | /~~\\ .__/ \\__, |  | | | \\| |___ | \\|");
         tg.setForegroundColor(TextColor.ANSI.BLUE_BRIGHT);
-        List<Machine> list = game.global_machines;
+        List<Machine> list = game.getMachines();
 
         if (list.isEmpty()) {
             tg.putString(4, 6, "Keine Maschinen vorhanden. Kauf dir welche!");
@@ -244,14 +245,14 @@ public class GUIManager {
         tg.putString(2, 2, ".__/ /~~\\ |___ |___ .__/");
 
         tg.setForegroundColor(TextColor.ANSI.BLUE_BRIGHT);
-        List<SalesAgent> list = game.global_salesAgents;
+        List<SalesAgent> list = game.getSalesAgents();
 
         if (list.isEmpty()) {
             tg.putString(4, 6, "Keine Verkäufer vorhanden. Nutze 'hire'!");
         } else {
             for (int i = 0; i < list.size(); i++) {
                 SalesAgent sa = list.get(i);
-                // Einfacher Info-String wie bei den Maschinen
+                // Einfacher Info-String
                 String info = (i + 1) + ". " + sa.getName() +
                         " | LVL: " + sa.getLevel() +
                         " | Fokus: " + sa.getFokus() +
@@ -278,7 +279,7 @@ public class GUIManager {
         tg.putString(4, y++, "Endguthaben:    " + game.getCash() + " €");y++;
         tg.putString(4, y++, "Gesamt " + Sock.type + "s:   " + game.seeSockID());y++;
         tg.putString(4, y++, "Gesamt " + Lobe.type + "s:   " + game.seeLobeID());y++;
-        tg.putString(4, y++, "Maschinenpark:  " + game.global_machines.size());y++;
+        tg.putString(4, y++, "Maschinenpark:  " + game.getMachines().size());y++;
 
         tg.setForegroundColor(TextColor.ANSI.RED_BRIGHT);
         tg.putString(2, y++, "--------------------------------------");y++;y++;
