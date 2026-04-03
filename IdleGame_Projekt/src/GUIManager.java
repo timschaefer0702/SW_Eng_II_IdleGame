@@ -31,7 +31,10 @@ public class GUIManager {
 
     public GUIManager(Game game) throws IOException {
         this.game = game;
-        Terminal terminal = new DefaultTerminalFactory().createTerminal();
+        Terminal terminal = new DefaultTerminalFactory()
+                .setForceTextTerminal(true)
+                .setPreferTerminalEmulator(false)
+                .createTerminal();
         this.screen = new TerminalScreen(terminal);
         this.screen.startScreen();
         this.screen.setCursorPosition(null);

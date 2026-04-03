@@ -85,6 +85,7 @@ public class Game implements Runnable {
             inputHandler = new InputHandler(this);
             guiManager = new GUIManager(this);
         } catch (Exception e) {
+            e.printStackTrace();
             return e;
         }
         return null;

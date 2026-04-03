@@ -1,5 +1,6 @@
 # SW_Eng_II_IdleGame
 
+<h2>Description</h2>
 This is the Repo of the DHBW Embedded Systems TES23 Software Engineering II Project.
 
 Assignees are:
@@ -16,3 +17,19 @@ The player controls this by console commands e.g.:
 account --> the current account balance is shown
 machines --> all of the current machines and their levels are shown
 upgrade machine "yxz" --> if the player has the currency to afford the upgrade the corresponding machine is upgraded.
+
+<h2>Windows Compatibility steps</h2>
+
+
+
++ Use lanterna-3.2.0-alpha1.jar
+
++ include jna.jar and jna-platforms.jar as libs
+
++ Command to successfull execution:
+
+    ``java -cp "out/production/SW_Eng_II_IdleGame;IdleGame_Projekt/lanterna-3.2.0-alpha1.jar;IdleGame_Projekt/jna-jpms-5.18.1.jar;IdleGame_Projekt/jna-platform-jpms-5.18.1.jar" Main``
+
++ Execution or .jar built by intellij not working so far -> jna seems to be not part of compile/run process
+
++ to execute code with changes built project in intellij first
