@@ -18,6 +18,12 @@ account --> the current account balance is shown
 machines --> all of the current machines and their levels are shown
 upgrade machine "yxz" --> if the player has the currency to afford the upgrade the corresponding machine is upgraded.
 
+<h2>Execuute compiled jar </h2>
+
++ open command prompt
+
++ ``java -jar SW_Eng_II_FactoryManager.jar``
+
 <h2>Windows Compatibility steps</h2>
 
 
